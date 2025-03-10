@@ -1,7 +1,7 @@
 namespace EssayFeedback.Components.Pages;
 
 using Microsoft.AspNetCore.Components;
-using Markdig;
+using MudBlazor;
 
 public partial class Home : ComponentBase
 {
@@ -13,6 +13,20 @@ public partial class Home : ComponentBase
     {
         RenderedRecommendationMarkdown = (MarkupString)Markdig.Markdown.ToHtml(recommendationMarkdown);
         RenderedModelMarkdown = (MarkupString)Markdig.Markdown.ToHtml(modelMarkdown);
+    }
+    
+    private async Task AnalyzeText()
+    {
+        await DialogService.ShowAsync<ModelProcessingDialog>(
+            "Custom Options Dialog",
+            new DialogOptions {MaxWidth = MaxWidth.Medium, FullWidth = true, Position = DialogPosition.TopCenter} );
+        // ShowSkeleton = true;
+        // ShowAnswer = false;
+        // var queryResponse = await searchService.Search(new SearchData(Topic, Duration, LessonComponents.ToList()));
+        // QueryResults.Clear();
+        // QueryResults.Add(queryResponse);
+        // ShowSkeleton = false;
+        // ShowAnswer = true;
     }
 
     private MarkupString EssayTextConverted { get; set; }
@@ -437,56 +451,79 @@ public partial class Home : ComponentBase
 
     private MarkupString RenderedRecommendationMarkdown { get; set; }
     private string recommendationMarkdown = """
-    # Feedback
-    
-    ## 1. Use of 'Till' vs. 'Until'
-    
-    **Original Text:**  
-    *"Till recently there was no convenient escape valve for the pressure created by these opposing forces."*
-    
-    **Recommendation:**  
-    AP Stylebook entry on 'till' vs. 'until': Avoid using 'till' in place of 'until.'
-    
-    **Explanation:**  
-    'Till' is considered outdated and nonstandard; 'until' is preferred in AP Style and is grammatically correct.
-    
-    ---
-    
-    ## 2. Use of Names in AP Style
-    
-    **Original Text:**  
-    *"You could pay someone to write for you, like JFK, or plagiarize, like MLK."*
-    
-    **Recommendation:**  
-    AP Stylebook guidance on names: Use full names on first reference unless the initials are widely recognized.
-    
-    **Explanation:**  
-    AP Style recommends spelling out full names on first reference. While 'JFK' and 'MLK' are widely known, the first reference should use their full names for clarity.
-    
-    ---
-    
-    ## 3. Proper Spelling of 'OK'
-    
-    **Original Text:**  
-    *"Instead of good writers, ok writers, and people who can't write, there will just be good writers and people who can't write."*
-    
-    **Recommendation:**  
-    AP Stylebook entry on 'OK': Always spell 'OK' in uppercase letters.
-    
-    **Explanation:**  
-    'OK' is the recognized spelling in AP Style. Using lowercase 'ok' violates this guideline.
-    
+    # AP Style Violations
+
+    1. **Original Text**: "The stuff they steal is usually the most mundane boilerplate - the sort of thing that anyone who was even halfway decent at writing could turn out with no effort at all."
+       - **AP Stylebook Rule**: AP Style requires em dashes to have spaces on both sides.
+       - **Explanation**: The em dash lacks spaces on either side, violating AP Style formatting guidelines.
+
+    2. **Original Text**: "Till recently there was no convenient escape valve for the pressure created by these opposing forces."
+       - **AP Stylebook Rule**: Use "until" rather than the informal "till."
+       - **Explanation**: "Till" is considered informal and not standard AP Style usage.
+
+    3. **Original Text**: "Instead of good writers, ok writers, and people who can't write, there will just be good writers and people who can't write."
+       - **AP Stylebook Rule**: AP Style requires "OK" to be written in full capital letters.
+       - **Explanation**: The lowercase "ok" does not align with AP Style's proper capitalization.
+
+    4. **Original Text**: "You can't make this point better than Leslie Lamport did:"
+       - **AP Stylebook Rule**: Quotations should be formatted appropriately, and block quotes are discouraged.
+       - **Explanation**: The colon at the end of the sentence creates ambiguity about the formatting of the upcoming quotation, which might not align with AP Style conventions.
+       
+    # Tone Consistency Evaluation
+
+    1. **Replace informal word choices with more formal alternatives.**
+       - Example: Replace "Till recently" with "Until recently" in Paragraph 6.
+       - Explanation: "Till" feels overly casual and inconsistent with the reflective tone. This change adds polish and appropriateness.
+
+    2. **Standardize usage of abbreviations and capitalizations to enhance credibility.**
+       - Example: Change "ok writers" to "OK writers" in Paragraph 8.
+       - Explanation: The lowercase "ok" appears informal and does not align with the essay's polished point. Using "OK" demonstrates attention to detail.
+
+    3. **Consider reviewing contractions in formal sections.**
+       - Example: "It's fundamentally difficult" could be rewritten as "It is fundamentally difficult" in Paragraph 3.
+       - Explanation: Reducing contractions in key analytical sections creates a more serious and reflective tone, suitable for persuasive writing.
+
+    4. **Reassess the use of playful phrasing in serious contexts.**
+       - Example: "Writes and write-nots" in Paragraph 8.
+       - Explanation: While engaging, this phrase may risk trivializing the argument, particularly for a formal audience. Simplifying the phrase would enhance clarity.
+
+    5. **Balance abrupt declarative statements for tone smoothness.**
+       - Example: "Yes, it's bad" in Paragraph 9 could be expanded to: "Yes, this situation is problematic."
+       - Explanation: Abrupt, overly casual statements can feel jarring and less impactful. Elaborating slightly maintains engagement without sacrificing the reflective tone.
+
+    # Identified Biases
+
+    1. Framing Bias
+    - **Original Text**: "AI has blown this world open."
+    - **Explanation**: This emotionally charged phrasing portrays AI as overwhelmingly disruptive, potentially skewing the reader's perception of AI as a negative force.
+
+    2. In-group Bias
+    - **Original Text**: "Some of us like it."
+    - **Explanation**: This language subtly aligns the author with "writers" as an in-group, creating an implicit division and favoring one group over another.
+
+    3. Stereotyping
+    - **Original Text**: "Eminent professors often turn out to have resorted to plagiarism."
+    - **Explanation**: This broad statement unfairly generalizes professors, implying a systemic tendency to plagiarize without offering evidence or context.
+
+    4. Selection Bias
+    - **Original Text**: The essay focuses entirely on the negative implications of AI replacing writing skills.
+    - **Explanation**: By ignoring potential benefits of AI, such as accessibility and enhanced creativity, the essay presents a one-sided argument.
+
+    5. False Equivalence
+    - **Original Text**: "There aren't many blacksmiths left, and it doesn't seem to be a problem."
+    - **Explanation**: Comparing writing-a fundamental skill-to blacksmithing oversimplifies the issue and minimizes the broader implications of losing writing abilities.
+
+    6. Oversimplification
+    - **Original Text**: "Instead of good writers, ok writers, and people who can't write, there will just be good writers and people who can't write."
+    - **Explanation**: This assertion oversimplifies the anticipated impact of AI on writing skills, ignoring its role in skill enhancement or education.
+
+    7. Confirmation Bias
+    - **Original Text**: "The most striking thing to me about these cases is the pettiness of the thefts... Which means they're not even halfway decent at writing."
+    - **Explanation**: The author assumes plagiarism is exclusively due to incompetence, confirming their narrative that writing is a challenging skill.
+
+    8. Authority Bias
+    - **Original Text**: "If you're thinking without writing, you only think you're thinking."
+    - **Explanation**: The essay heavily relies on this quote without critically examining its applicability, potentially overemphasizing a single authoritative opinion.
+
     """;
-
-    private void RenderMarkdown()
-    {
-        // Configure Markdig pipeline
-        var pipeline = new MarkdownPipelineBuilder()
-            .UseAdvancedExtensions()
-            .Build();
-
-        //EssayTextConverted = ConvertNewlinesToHtml(essayText);
-        // Convert markdown to HTML
-        //RenderedMarkdown = Markdown.ToHtml(MarkdownContent ?? string.Empty, pipeline);
-    }
 }
