@@ -1,0 +1,115 @@
+﻿@page "/"
+@using Markdig
+
+<PageTitle>Home</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
+    <MudText Typo="Typo.h4" Class="mb-4">Markdown Editor</MudText>
+
+    <MudGrid>
+        <!-- Left column with textarea -->
+        <MudItem xs="12" md="6">
+            <MudPaper Elevation="2" Class="pa-4 d-flex flex-column" Style="height: 500px;">
+                <MudText Typo="Typo.subtitle1" Class="mb-2">Edit Markdown</MudText>
+                <MudTextField @bind-Value="MarkdownContent"
+                              Label="Enter markdown here"
+                              Variant="Variant.Outlined"
+                              Lines="20"
+                              Class="flex-grow-1"
+                              AutoSize="true"
+                              Immediate="true"
+                              TextChanged="OnTextChanged" />
+            </MudPaper>
+        </MudItem>
+
+        <!-- Right column with markdown preview -->
+        <MudItem xs="12" md="6">
+            <MudPaper Elevation="2" Class="pa-4 d-flex flex-column" Style="height: 500px;">
+                <MudText Typo="Typo.subtitle1" Class="mb-2">Preview</MudText>
+                <MudPaper Class="pa-4 flex-grow-1 overflow-auto mud-background-gray" Style="height: 0;">
+                    @((MarkupString)RenderedMarkdown)
+                </MudPaper>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+    <!-- Accordion with raw content -->
+    <MudExpansionPanels Class="mt-4">
+        <MudExpansionPanel>
+            <TitleContent>
+                <MudText Typo="Typo.h6">Raw Content</MudText>
+            </TitleContent>
+            <ChildContent>
+                <MudCard Elevation="0" Class="mt-2">
+                    <MudCardContent>
+                        <MudTextField @bind-Value="MarkdownContent"
+                                      Label="Raw Text"
+                                      Variant="Variant.Outlined"
+                                      ReadOnly="true"
+                                      Lines="10" />
+                    </MudCardContent>
+                </MudCard>
+            </ChildContent>
+        </MudExpansionPanel>
+    </MudExpansionPanels>
+</MudContainer>
+
+@code {
+
+public record ChatResponse(string Author, string Reasoning, List<Feedback> Feedbacks);
+public record Feedback(string OriginalText, string Recommendation, string Explanation);
+public record FeedbackResponse(List<Feedback> Feedback);
+
+protected override void OnInitialized()
+{
+    var a = new List<ChatResponse>
+    {
+        {new("One", "Reasoning", new List<Feedback> {new("OriginalText", "Recommendation", "Explanation")})},
+        {new("Two", "Two R", new List<Feedback> {new("OriginalText", "Recommendation", "Explanation")})}
+    };
+    RenderMarkdown();
+}
+
+
+private string MarkdownContent { get; set; } = @"# Markdown Example
+    
+## Features
+
+- **Bold text** and *italic text*
+- Lists like this one
+- [Links](https://mudblazor.com/)
+- Code blocks
+
+```csharp
+public class Example
+{
+    public void Demo()
+    {
+        Console.WriteLine(""Hello, MudBlazor!"");
+    }
+}
+```
+
+> Blockquotes are supported too!
+
+";
+
+private string RenderedMarkdown { get; set; }
+
+
+private void OnTextChanged(string value)
+{
+    RenderMarkdown();
+}
+
+private void RenderMarkdown()
+{
+    // Configure Markdig pipeline
+    var pipeline = new MarkdownPipelineBuilder()
+        .UseAdvancedExtensions()
+        .Build();
+
+    // Convert markdown to HTML
+    RenderedMarkdown = Markdown.ToHtml(MarkdownContent ?? string.Empty, pipeline);
+}
+}
