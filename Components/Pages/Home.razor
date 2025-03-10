@@ -1,115 +1,53 @@
 ﻿@page "/"
-@using Markdig
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Essay Feedback</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
-    <MudText Typo="Typo.h4" Class="mb-4">Markdown Editor</MudText>
+    <MudText Typo="Typo.h4" Class="mb-4">Essay Feedback</MudText>
 
     <MudGrid>
         <!-- Left column with textarea -->
         <MudItem xs="12" md="6">
             <MudPaper Elevation="2" Class="pa-4 d-flex flex-column" Style="height: 500px;">
-                <MudText Typo="Typo.subtitle1" Class="mb-2">Edit Markdown</MudText>
-                <MudTextField @bind-Value="MarkdownContent"
-                              Label="Enter markdown here"
+                <MudText Typo="Typo.subtitle1" Class="mb-2">Essay Text</MudText>
+                <MudTextField @bind-Value="essayText"
+                              Label="Enter essay text"
                               Variant="Variant.Outlined"
                               Lines="20"
+                              Multiline="true"
                               Class="flex-grow-1"
-                              AutoSize="true"
-                              Immediate="true"
-                              TextChanged="OnTextChanged" />
+                              Immediate="true">
+                </MudTextField>
             </MudPaper>
         </MudItem>
 
-        <!-- Right column with markdown preview -->
         <MudItem xs="12" md="6">
             <MudPaper Elevation="2" Class="pa-4 d-flex flex-column" Style="height: 500px;">
-                <MudText Typo="Typo.subtitle1" Class="mb-2">Preview</MudText>
+                <MudText Typo="Typo.subtitle1" Class="mb-2">Recommendations</MudText>
                 <MudPaper Class="pa-4 flex-grow-1 overflow-auto mud-background-gray" Style="height: 0;">
-                    @((MarkupString)RenderedMarkdown)
+                    @((MarkupString)RenderedRecommendationMarkdown)
                 </MudPaper>
             </MudPaper>
         </MudItem>
     </MudGrid>
 
-    <!-- Accordion with raw content -->
     <MudExpansionPanels Class="mt-4">
         <MudExpansionPanel>
             <TitleContent>
-                <MudText Typo="Typo.h6">Raw Content</MudText>
+                <MudText Typo="Typo.h6">Model Response</MudText>
             </TitleContent>
             <ChildContent>
                 <MudCard Elevation="0" Class="mt-2">
                     <MudCardContent>
-                        <MudTextField @bind-Value="MarkdownContent"
-                                      Label="Raw Text"
+                        <MudText Label="Model Response"
                                       Variant="Variant.Outlined"
                                       ReadOnly="true"
-                                      Lines="10" />
+                                      Lines="10">
+                        @((MarkupString)RenderedModelMarkdown)
+                        </MudText>
                     </MudCardContent>
                 </MudCard>
             </ChildContent>
         </MudExpansionPanel>
     </MudExpansionPanels>
 </MudContainer>
-
-@code {
-
-public record ChatResponse(string Author, string Reasoning, List<Feedback> Feedbacks);
-public record Feedback(string OriginalText, string Recommendation, string Explanation);
-public record FeedbackResponse(List<Feedback> Feedback);
-
-protected override void OnInitialized()
-{
-    var a = new List<ChatResponse>
-    {
-        {new("One", "Reasoning", new List<Feedback> {new("OriginalText", "Recommendation", "Explanation")})},
-        {new("Two", "Two R", new List<Feedback> {new("OriginalText", "Recommendation", "Explanation")})}
-    };
-    RenderMarkdown();
-}
-
-
-private string MarkdownContent { get; set; } = @"# Markdown Example
-    
-## Features
-
-- **Bold text** and *italic text*
-- Lists like this one
-- [Links](https://mudblazor.com/)
-- Code blocks
-
-```csharp
-public class Example
-{
-    public void Demo()
-    {
-        Console.WriteLine(""Hello, MudBlazor!"");
-    }
-}
-```
-
-> Blockquotes are supported too!
-
-";
-
-private string RenderedMarkdown { get; set; }
-
-
-private void OnTextChanged(string value)
-{
-    RenderMarkdown();
-}
-
-private void RenderMarkdown()
-{
-    // Configure Markdig pipeline
-    var pipeline = new MarkdownPipelineBuilder()
-        .UseAdvancedExtensions()
-        .Build();
-
-    // Convert markdown to HTML
-    RenderedMarkdown = Markdown.ToHtml(MarkdownContent ?? string.Empty, pipeline);
-}
-}
