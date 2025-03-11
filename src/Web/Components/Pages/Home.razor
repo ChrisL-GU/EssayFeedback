@@ -1,0 +1,52 @@
+﻿@page "/"
+@inject IDialogService DialogService
+
+<PageTitle>Essay Feedback</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
+    <MudGrid>
+        <MudItem xs="12" md="6">
+            <MudPaper Elevation="2" Class="pa-4 d-flex flex-column" Style="height: 500px;">
+                <MudText Typo="Typo.subtitle1" Class="mb-2">Essay Text</MudText>
+                <MudTextField @bind-Value="essayText"
+                              Label="Enter essay text"
+                              Variant="Variant.Outlined"
+                              Lines="20"
+                              Multiline="true"
+                              Class="flex-grow-1"
+                              Immediate="true">
+                </MudTextField>
+            </MudPaper>
+            <MudButton Variant="Variant.Filled" Class="mb-4 mt-4" onclick="AnalyzeText" Color="Color.Primary">Analyze</MudButton>
+        </MudItem>
+
+        <MudItem xs="12" md="6">
+            <MudPaper Elevation="2" Class="pa-4 d-flex flex-column" Style="height: 500px;">
+                <MudText Typo="Typo.subtitle1" Class="mb-2">Recommendations</MudText>
+                <MudPaper Class="pa-4 flex-grow-1 overflow-auto mud-background-gray" >
+                    @RenderedRecommendationMarkdown
+                </MudPaper>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+    <MudExpansionPanels Class="mt-4">
+        <MudExpansionPanel>
+            <TitleContent>
+                <MudText Typo="Typo.h6">Model Response</MudText>
+            </TitleContent>
+            <ChildContent>
+                <MudCard Elevation="0" Class="mt-2">
+                    <MudCardContent>
+                        <MudText Label="Model Response"
+                                 Variant="Variant.Outlined"
+                                 ReadOnly="true"
+                                 Lines="10">
+                            @RenderedModelMarkdown
+                        </MudText>
+                    </MudCardContent>
+                </MudCard>
+            </ChildContent>
+        </MudExpansionPanel>
+    </MudExpansionPanels>
+</MudContainer>
