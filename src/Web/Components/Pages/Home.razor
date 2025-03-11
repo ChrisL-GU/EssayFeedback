@@ -1,5 +1,4 @@
 ﻿@page "/"
-@inject IDialogService DialogService
 
 <PageTitle>Essay Feedback</PageTitle>
 
@@ -8,7 +7,7 @@
         <MudItem xs="12" md="6">
             <MudPaper Elevation="2" Class="pa-4 d-flex flex-column" Style="height: 500px;">
                 <MudText Typo="Typo.subtitle1" Class="mb-2">Essay Text</MudText>
-                <MudTextField @bind-Value="essayText"
+                <MudTextField @bind-Value="EssayText"
                               Label="Enter essay text"
                               Variant="Variant.Outlined"
                               Lines="20"
