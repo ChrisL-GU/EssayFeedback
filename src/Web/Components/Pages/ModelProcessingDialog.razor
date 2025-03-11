@@ -6,20 +6,39 @@
     </TitleContent>
     <DialogContent>
         <MudContainer Style="max-height: 500px; height: 90vh; overflow-y: scroll">
-            <MudPaper id="textContainer" Elevation="2" Class="pa-4 overflow-auto mud-background-gray" Style="height: calc(100% - 40px); white-space: preserve-breaks">
-                @TextToAnalyze
-            </MudPaper>
+            @if (isLoading)
+            {
+                <MudPaper Elevation="2" Class="pa-4 overflow-auto mud-background-gray" Style="height: calc(100% - 40px); white-space: preserve-breaks">
+                    <MudSkeleton Width="100%"/>
+                    <MudSkeleton Width="100%"/>
+                    <MudSkeleton Width="100%"/>
+                    <MudSkeleton Width="20%"/>
+                </MudPaper>
+            }
+            else
+            {
+                <MudPaper id="textContainer" Elevation="2" Class="pa-4 overflow-auto mud-background-gray" Style="height: calc(100% - 40px); white-space: preserve-breaks">
+                    @TextToAnalyze
+                </MudPaper>
+            }
         </MudContainer>
     </DialogContent>
 </MudDialog>
 
 @code {
+    private bool isLoading = true;
+    
     [CascadingParameter]
     private IMudDialogInstance? MudDialog { get; set; }
 
     [Parameter]
     public string TextToAnalyze { get; set; } = string.Empty;
 
+    protected override void OnParametersSet()
+    {
+        isLoading = true;
+    }
+    
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await ScrollToBottom();
@@ -27,6 +46,7 @@
 
     public async Task UpdateText(string text)
     {
+        isLoading = false;
         TextToAnalyze = text;
         StateHasChanged();
         await ScrollToBottom();

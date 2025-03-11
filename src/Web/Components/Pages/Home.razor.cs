@@ -13,7 +13,10 @@ using Strategies;
 public partial class Home : ComponentBase
 {
     private AgentGroupChat chat = new();
-    
+    private string[] agentNames = [];
+    private IEnumerable<string> selectedAgentNames = [];
+    private EssayAgents agents = new();
+
     [Inject]
     public required IDialogService DialogService { get; set; }
     [Inject]
@@ -35,25 +38,15 @@ public partial class Home : ComponentBase
             settings.AzureOpenAi.ApiKey);
         var kernel = builder.Build();
 
-        var agents = new EssayAgents(kernel);
-
-        chat =
-            new AgentGroupChat(agents.GetAgents())
-            {
-                ExecutionSettings = new AgentGroupChatSettings
-                {
-                    SelectionStrategy = new SequentialSelectionStrategy(),
-                    TerminationStrategy = new ApprovalTerminationStrategy()
-                    {
-                        Agents = [agents.FinalAgent],
-                        MaximumIterations = agents.GetAgents().Length // * 3,
-                    }
-                }
-            };
+        agents = new EssayAgents(kernel);
+        agentNames = agents.GetAgentNames();
+        selectedAgentNames = [agentNames.Last()];
     }
 
     private async Task AnalyzeText()
     {
+        RenderedRecommendationMarkdown = new MarkupString();
+        RenderedModelMarkdown = new MarkupString();
         var text = string.Empty;
         var parameters = new DialogParameters
         {
@@ -64,7 +57,8 @@ public partial class Home : ComponentBase
             parameters,
             new DialogOptions {MaxWidth = MaxWidth.Medium, FullWidth = true,  Position = DialogPosition.TopCenter} );
         var dialogInstance = dialog.Dialog as ModelProcessingDialog;
-        
+
+        chat = AgentManagement.CreateAgentGroupChatFor(agents, selectedAgentNames.ToArray());
         chat.AddChatMessage(new ChatMessageContent(AuthorRole.User, EssayText));
         chat.IsComplete = false;
         
@@ -73,30 +67,13 @@ public partial class Home : ComponentBase
             text += chatMessageContent.Content ?? "";
             dialogInstance?.UpdateText(text);
         }
-            
-        var history = await chat.GetChatMessagesAsync().ToArrayAsync();
-        
-        var modelAnalysis = history[0].Content?.GetBetween("<essay_analysis>", "</essay_analysis>") +
-            history[1].Content?.GetBetween("<essay_analysis>", "</essay_analysis>") +
-            history[2].Content?.GetBetween("<essay_analysis>", "</essay_analysis>") ?? ""
-            .Trim();
-        var modelFeedback = history[0].Content?.GetBetween("<feedback>", "</feedback>") +
-            history[1].Content?.GetBetween("<feedback>", "</feedback>") +
-            history[2].Content?.GetBetween("<feedback>", "</feedback>")
-            .Trim();
-        
+
+        var (modelAnalysis, modelFeedback) = await AgentManagement.AggergateAgentHistoryResponses(chat);
         RenderedRecommendationMarkdown = (MarkupString)Markdig.Markdown.ToHtml(modelFeedback);
         RenderedModelMarkdown = (MarkupString)Markdig.Markdown.ToHtml(modelAnalysis);
         
         DialogService.Close(dialog);
-    
-        // ShowSkeleton = true;
-        // ShowAnswer = false;
-        // var queryResponse = await searchService.Search(new SearchData(Topic, Duration, LessonComponents.ToList()));
-        // QueryResults.Clear();
-        // QueryResults.Add(queryResponse);
-        // ShowSkeleton = false;
-        // ShowAnswer = true;
+        dialogInstance?.UpdateText("");
     }
 
 }
