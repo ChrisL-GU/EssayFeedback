@@ -1,25 +1,88 @@
 namespace EssayFeedback.Components.Pages;
 
+using Common;
 using Microsoft.AspNetCore.Components;
+using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.Agents;
+using Microsoft.SemanticKernel.Agents.Chat;
+using Microsoft.SemanticKernel.ChatCompletion;
 using MudBlazor;
+using Strategies;
 
 public partial class Home : ComponentBase
 {
+    private AgentGroupChat chat = new();
+    
     public record ChatResponse(string Author, string Reasoning, List<Feedback> Feedbacks);
     public record Feedback(string OriginalText, string Recommendation, string Explanation);
     public record FeedbackResponse(List<Feedback> Feedback);
 
     protected override void OnInitialized()
     {
-        RenderedRecommendationMarkdown = (MarkupString)Markdig.Markdown.ToHtml(recommendationMarkdown);
-        RenderedModelMarkdown = (MarkupString)Markdig.Markdown.ToHtml(modelMarkdown);
+        Settings settings = new();
+        var builder = Kernel.CreateBuilder();
+
+        builder.AddAzureOpenAIChatCompletion(
+            settings.AzureOpenAi.ChatModelDeployment,
+            settings.AzureOpenAi.Endpoint,
+            settings.AzureOpenAi.ApiKey);
+        var kernel = builder.Build();
+
+        var agents = new EssayAgents(kernel);
+
+        chat =
+            new AgentGroupChat(agents.GetAgents())
+            {
+                ExecutionSettings = new AgentGroupChatSettings
+                {
+                    SelectionStrategy = new SequentialSelectionStrategy(),
+                    TerminationStrategy = new ApprovalTerminationStrategy()
+                    {
+                        Agents = [agents.FinalAgent],
+                        MaximumIterations = agents.GetAgents().Length // * 3,
+                    }
+                }
+            };
     }
-    
+
     private async Task AnalyzeText()
     {
-        await DialogService.ShowAsync<ModelProcessingDialog>(
-            "Custom Options Dialog",
-            new DialogOptions {MaxWidth = MaxWidth.Medium, FullWidth = true, Position = DialogPosition.TopCenter} );
+        var text = string.Empty;
+        var parameters = new DialogParameters
+        {
+            [nameof(ModelProcessingDialog.TextToAnalyze)] = text
+        };
+        var dialog = await DialogService.ShowAsync<ModelProcessingDialog>(
+            "Analyzing Text",
+            parameters,
+            new DialogOptions {MaxWidth = MaxWidth.Medium, FullWidth = true,  Position = DialogPosition.TopCenter} );
+        var dialogInstance = dialog.Dialog as ModelProcessingDialog;
+        
+        chat.AddChatMessage(new ChatMessageContent(AuthorRole.User, TextToAnalyze.PaulGraham));
+        chat.IsComplete = false;
+        
+        await foreach (var chatMessageContent in chat.InvokeStreamingAsync())
+        {
+            text += chatMessageContent.Content ?? "";
+            dialogInstance?.UpdateText(text);
+        }
+            
+        var history = await chat.GetChatMessagesAsync().ToArrayAsync();
+        
+        var modelAnalysis = history[0].Content?.GetBetween("<essay_analysis>", "</essay_analysis>") +
+            history[1].Content?.GetBetween("<essay_analysis>", "</essay_analysis>") +
+            history[2].Content?.GetBetween("<essay_analysis>", "</essay_analysis>") ?? ""
+            .Trim();
+        var modelFeedback = history[0].Content?.GetBetween("<feedback>", "</feedback>") +
+            history[1].Content?.GetBetween("<feedback>", "</feedback>") +
+            history[2].Content?.GetBetween("<feedback>", "</feedback>")
+            .Trim();
+        
+        RenderedRecommendationMarkdown = (MarkupString)Markdig.Markdown.ToHtml(modelFeedback);
+        RenderedModelMarkdown = (MarkupString)Markdig.Markdown.ToHtml(modelAnalysis);
+        
+        DialogService.Close(dialog);
+    
         // ShowSkeleton = true;
         // ShowAnswer = false;
         // var queryResponse = await searchService.Search(new SearchData(Topic, Duration, LessonComponents.ToList()));
@@ -526,4 +589,5 @@ public partial class Home : ComponentBase
     - **Explanation**: The essay heavily relies on this quote without critically examining its applicability, potentially overemphasizing a single authoritative opinion.
 
     """;
+
 }

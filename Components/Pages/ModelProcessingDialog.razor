@@ -1,22 +1,39 @@
+@inject IJSRuntime JsRuntime
+
 <MudDialog>
     <TitleContent>
-        Dialog Title
+        <MudText Typo="Typo.h6">Analyzing Text</MudText>
     </TitleContent>
     <DialogContent>
-        Dialog Content
+        <MudContainer Style="max-height: 500px; height: 90vh; overflow-y: scroll">
+            <MudPaper id="textContainer" Elevation="2" Class="pa-4 overflow-auto mud-background-gray" Style="height: calc(100% - 40px); white-space: preserve-breaks">
+                @TextToAnalyze
+            </MudPaper>
+        </MudContainer>
     </DialogContent>
-    <DialogActions>
-        <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
-    </DialogActions>
 </MudDialog>
 
 @code {
-[CascadingParameter]
-private IMudDialogInstance? MudDialog { get; set; }
+    [CascadingParameter]
+    private IMudDialogInstance? MudDialog { get; set; }
 
-private void Submit() => MudDialog?.Close(DialogResult.Ok(true));
+    [Parameter]
+    public string TextToAnalyze { get; set; } = string.Empty;
 
-private void Cancel() => MudDialog?.Cancel();
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await ScrollToBottom();
+    }
+
+    public async Task UpdateText(string text)
+    {
+        TextToAnalyze = text;
+        StateHasChanged();
+        await ScrollToBottom();
+    }
+
+    private async Task ScrollToBottom()
+    {
+        await JsRuntime.InvokeVoidAsync("scrollToBottom", "#textContainer");
+    }
 }
-
