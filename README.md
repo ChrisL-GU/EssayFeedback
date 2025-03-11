@@ -5,4 +5,5 @@ created to review the text of a submitted essay and provide feedback to the user
 on a particular aspect of the text. Agents are instructed to not rewrite the text, they are only to
 identify issues and provide explanations of the issue. This app is for demonstration purposes.
 
-![demo](./docs/demo.mp4)
+https://github.com/user-attachments/assets/498cefe9-0908-4399-8fbf-1984eac6d400
+
