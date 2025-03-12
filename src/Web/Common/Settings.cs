@@ -26,8 +26,11 @@ public class Settings
 
     public class AzureOpenAiSettings
     {
-        public string ChatModelDeployment { get; set; } = string.Empty;
-        public string Endpoint { get; set; } = string.Empty;
-        public string ApiKey { get; set; } = string.Empty;
+        // ReSharper disable InconsistentNaming
+        public string EndpointGpt4o { get; set; } = string.Empty;
+        public string ApiKeyGpt4o { get; set; } = string.Empty;
+        public string ApiKeyLlama { get; set; } = string.Empty;
+        public string EndpointLlama { get; set; } = string.Empty;
+        // ReSharper restore InconsistentNaming
     }
 }

@@ -1,14 +1,26 @@
 namespace EssayFeedback.Common;
 
 using System.Text;
+using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.Agents.Chat;
 using Strategies;
 
-public static class AgentManagement
+public record AgentHistoryResponse(string ModelAnalysis, string Recommendation);
+
+public class AgentManagement(Settings settings)
 {
-    public static AgentGroupChat CreateAgentGroupChatFor(EssayAgents agents, string[] agentNames) =>
-        new(agents.GetAgentsByName(agentNames))
+    public AgentGroupChat CreateAgentGroupChatFor(string selectedModel, string[] selectedAgentNames)
+    {
+        var builder = Kernel.CreateBuilder();
+        
+        if (selectedModel == "gpt-4o") AddGptSettings(selectedModel, builder);
+        else AddLlamaSettings(selectedModel, builder);
+            
+        var kernel = builder.Build();
+        var agents = new EssayAgents(kernel);
+        
+        return new AgentGroupChat(agents.GetAgentsByName(selectedAgentNames))
         {
             ExecutionSettings = new AgentGroupChatSettings
             {
@@ -20,8 +32,9 @@ public static class AgentManagement
                 }
             }
         };
+    }
 
-    public static async Task<AgentHistoryResponse> AggergateAgentHistoryResponses(AgentGroupChat chat)
+    public async Task<AgentHistoryResponse> AggergateAgentHistoryResponses(AgentGroupChat chat)
     {
         var history = await chat.GetChatMessagesAsync().ToArrayAsync();
 
@@ -38,6 +51,16 @@ public static class AgentManagement
         
         return new AgentHistoryResponse(modelAnalysis.ToString(), modelRecommendation.ToString()); 
     }
-    
-    public record AgentHistoryResponse(string ModelAnalysis, string Recommendation);
+
+    private void AddGptSettings(string selectedModel, IKernelBuilder builder) =>
+        builder.AddAzureOpenAIChatCompletion(
+            selectedModel,
+            settings.AzureOpenAi.EndpointGpt4o,
+            settings.AzureOpenAi.ApiKeyGpt4o);
+
+    private void AddLlamaSettings(string selectedModel, IKernelBuilder builder) =>
+        builder.AddAzureAIInferenceChatCompletion(
+            selectedModel,
+            settings.AzureOpenAi.ApiKeyLlama,
+            new Uri(settings.AzureOpenAi.EndpointLlama));
 }

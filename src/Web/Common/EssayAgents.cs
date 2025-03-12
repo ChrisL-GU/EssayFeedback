@@ -8,19 +8,18 @@ public class EssayAgents
 {
      private readonly Dictionary<string, Agent> agents;
 
-     public EssayAgents()
+     private static readonly Dictionary<string, Func<Kernel, Agent>> scaffoldAgents = new()
      {
-         agents = new Dictionary<string, Agent>();
-     }
+         {"AP Stylebook", ApStylebookAgent.CreateAgent },
+         {"Tone Consistency", ToneConsistencyAgent.CreateAgent },
+         {"Bias Detection", BiasDetectionAgent.CreateAgent }
+     };
 
      public EssayAgents(Kernel kernel)
      {
-         agents = new Dictionary<string, Agent>
-         {
-             {"AP Stylebook", ApStylebookAgent.CreateAgent(kernel)},
-             {"Tone Consistency", ToneConsistencyAgent.CreateAgent(kernel)},
-             {"Bias Detection", BiasDetectionAgent.CreateAgent(kernel)}
-         };
+         agents = scaffoldAgents.ToDictionary(
+             agent => agent.Key,
+             agent => agent.Value(kernel));
      }
      
      public Agent[] GetAgents() => agents.Values.ToArray();
@@ -29,7 +28,8 @@ public class EssayAgents
              .Where(agent => agentNames.Contains(agent.Key))
              .Select(agent => agent.Value)
              .ToArray();
-     public string[] GetAgentNames() => agents.Keys.ToArray();
+
+     public static string[] GetAgentNames() => scaffoldAgents.Keys.ToArray();
      public Agent InitialAgent => GetAgents().First();
      public Agent FinalAgent => GetAgents().Last();
 

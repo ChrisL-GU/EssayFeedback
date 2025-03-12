@@ -16,10 +16,16 @@
                               Immediate="true">
                 </MudTextField>
             </MudPaper>
-            <MudSelect T="string" Label="Tools to evaulate the essay text" MultiSelection="true" @bind-SelectedValues="selectedAgentNames">
-                @foreach (var agent in agentNames)
+            <MudSelect T="string" Label="Tools to evaluate the essay text" MultiSelection="true" @bind-SelectedValues="selectedAgentNames">
+                @foreach (var agentName in agentNames)
                 {
-                    <MudSelectItem T="string" Value="@agent">@agent</MudSelectItem>
+                    <MudSelectItem T="string" Value="@agentName">@agentName</MudSelectItem>
+                }
+            </MudSelect>
+            <MudSelect T="string" Label="Model to use" @bind-value="selectedModel">
+                @foreach (var modelName in modelNames.Keys)
+                {
+                    <MudSelectItem T="string" Value="@modelName">@modelName</MudSelectItem>
                 }
             </MudSelect>
             <MudButton Variant="Variant.Filled" Class="mb-4 mt-4" onclick="AnalyzeText" Color="Color.Primary">Analyze</MudButton>

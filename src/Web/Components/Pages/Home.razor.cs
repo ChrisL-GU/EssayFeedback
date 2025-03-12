@@ -5,18 +5,23 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.FeatureManagement;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
-using Microsoft.SemanticKernel.Agents.Chat;
 using Microsoft.SemanticKernel.ChatCompletion;
 using MudBlazor;
-using Strategies;
 
 public partial class Home : ComponentBase
 {
     private AgentGroupChat chat = new();
     private string[] agentNames = [];
     private IEnumerable<string> selectedAgentNames = [];
-    private EssayAgents agents = new();
+    private readonly Dictionary<string, string> modelNames = new()
+    {
+        { "gpt-4o", "AzureOpenAISettings:Gpt4o-ApiKey" },
+        { "llama", "AzureOpenAISettings:Llama70-ApiKey" }
+    };
+    private string selectedModel = "";
 
+    [Inject]
+    public required AgentManagement AgentManagement { get; set; }
     [Inject]
     public required IDialogService DialogService { get; set; }
     [Inject]
@@ -29,17 +34,9 @@ public partial class Home : ComponentBase
     protected override async Task OnInitializedAsync()
     {
         if (await FeatureManager.IsEnabledAsync("DefaultEssayText")) EssayText = TextToAnalyze.PaulGraham;
-        Settings settings = new();
-        var builder = Kernel.CreateBuilder();
+        selectedModel = modelNames.Last().Key;
 
-        builder.AddAzureOpenAIChatCompletion(
-            settings.AzureOpenAi.ChatModelDeployment,
-            settings.AzureOpenAi.Endpoint,
-            settings.AzureOpenAi.ApiKey);
-        var kernel = builder.Build();
-
-        agents = new EssayAgents(kernel);
-        agentNames = agents.GetAgentNames();
+        agentNames = EssayAgents.GetAgentNames();
         selectedAgentNames = [agentNames.Last()];
     }
 
@@ -58,7 +55,7 @@ public partial class Home : ComponentBase
             new DialogOptions {MaxWidth = MaxWidth.Medium, FullWidth = true,  Position = DialogPosition.TopCenter} );
         var dialogInstance = dialog.Dialog as ModelProcessingDialog;
 
-        chat = AgentManagement.CreateAgentGroupChatFor(agents, selectedAgentNames.ToArray());
+        chat = AgentManagement.CreateAgentGroupChatFor(selectedModel, selectedAgentNames.ToArray());
         chat.AddChatMessage(new ChatMessageContent(AuthorRole.User, EssayText));
         chat.IsComplete = false;
         

@@ -47,3 +47,19 @@ Ideas for future agents are:
 - Historical/Cultural Context Advisor - Flags references that might need additional context for readers
 - Technical Terminology Reviewer - Checks for appropriate use of domain-specific terminology
 - Visual Element Integration Advisor - Provides feedback on the effective use of charts, graphs, or images
+
+## Running locally
+
+Deploy the following models to Azure Foundry:
+
+- `Llama-3.3-70B-Instruct` and use the name "llama"
+- `gpt-4o` and use the name "gpt-40"
+
+Add the `dotnet user-secrets`:
+
+```
+dotnet user-secrets set "AzureOpenAISettings:EndpointLlama" "<API endpoint>"
+dotnet user-secrets set "AzureOpenAISettings:EndpointGpt4o" "<API endpoint>"
+dotnet user-secrets set "AzureOpenAISettings:ApiKeyLlama" "<API key>"
+dotnet user-secrets set "AzureOpenAISettings:ApiKeyGpt4o" "<API key>"
+```

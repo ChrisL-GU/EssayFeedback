@@ -1,16 +1,16 @@
+using EssayFeedback.Common;
 using MudBlazor.Services;
 using EssayFeedback.Components;
 using Microsoft.FeatureManagement;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add MudBlazor services
+builder.Services.AddScopedFeatureManagement();
 builder.Services
+    .AddSingleton(_ => new Settings())
+    .AddSingleton<AgentManagement>()
     .AddMudServices()
-    .AddScopedFeatureManagement();
-
-// Add services to the container.
-builder.Services.AddRazorComponents()
+    .AddRazorComponents()
     .AddInteractiveServerComponents();
 
 var app = builder.Build();
