@@ -13,9 +13,10 @@ public class AgentManagement(Settings settings)
     public AgentGroupChat CreateAgentGroupChatFor(string selectedModel, string[] selectedAgentNames)
     {
         var builder = Kernel.CreateBuilder();
-        
-        if (selectedModel == "gpt-4o") AddGptSettings(selectedModel, builder);
-        else AddLlamaSettings(selectedModel, builder);
+
+        var modelSettings = settings.AzureAiSettings.Single(modelSettings => modelSettings.Key == selectedModel);
+        if (modelSettings.Value.IsAzureOpenAiModel) AddOpenASettings(modelSettings, builder);
+        else AddAiInferenceSettings(modelSettings, builder);
             
         var kernel = builder.Build();
         var agents = new EssayAgents(kernel);
@@ -40,7 +41,7 @@ public class AgentManagement(Settings settings)
 
         var modelAnalysis = new StringBuilder();
         var modelRecommendation = new StringBuilder();
-        for (var i = history.Length - 1; i >= 0; i--)
+        for (var i = history.Length - 2; i >= 0; i--)
         {
             var analysis = history[i].Content?.GetBetween("<essay_analysis>", "</essay_analysis>");
             var recommendation = history[i].Content?.GetBetween("<feedback>", "</feedback>");
@@ -52,15 +53,15 @@ public class AgentManagement(Settings settings)
         return new AgentHistoryResponse(modelAnalysis.ToString(), modelRecommendation.ToString()); 
     }
 
-    private void AddGptSettings(string selectedModel, IKernelBuilder builder) =>
+    private void AddOpenASettings(KeyValuePair<string, AiSettings> modelSettings, IKernelBuilder builder) =>
         builder.AddAzureOpenAIChatCompletion(
-            selectedModel,
-            settings.AzureOpenAi.EndpointGpt4o,
-            settings.AzureOpenAi.ApiKeyGpt4o);
+            modelSettings.Key,
+            modelSettings.Value.Endpoint,
+            modelSettings.Value.ApiKey);
 
-    private void AddLlamaSettings(string selectedModel, IKernelBuilder builder) =>
+    private void AddAiInferenceSettings(KeyValuePair<string, AiSettings> modeliSettings, IKernelBuilder builder) =>
         builder.AddAzureAIInferenceChatCompletion(
-            selectedModel,
-            settings.AzureOpenAi.ApiKeyLlama,
-            new Uri(settings.AzureOpenAi.EndpointLlama));
+            modeliSettings.Key,
+            modeliSettings.Value.ApiKey,
+            new Uri(modeliSettings.Value.Endpoint));
 }

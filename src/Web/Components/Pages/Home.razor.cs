@@ -13,13 +13,11 @@ public partial class Home : ComponentBase
     private AgentGroupChat chat = new();
     private string[] agentNames = [];
     private IEnumerable<string> selectedAgentNames = [];
-    private readonly Dictionary<string, string> modelNames = new()
-    {
-        { "gpt-4o", "AzureOpenAISettings:Gpt4o-ApiKey" },
-        { "llama", "AzureOpenAISettings:Llama70-ApiKey" }
-    };
+    private string[] modelNames = [];
     private string selectedModel = "";
 
+    [Inject]
+    public required Settings Settings { get; set; }
     [Inject]
     public required AgentManagement AgentManagement { get; set; }
     [Inject]
@@ -34,7 +32,8 @@ public partial class Home : ComponentBase
     protected override async Task OnInitializedAsync()
     {
         if (await FeatureManager.IsEnabledAsync("DefaultEssayText")) EssayText = TextToAnalyze.PaulGraham;
-        selectedModel = modelNames.Last().Key;
+        modelNames = Settings.AzureAiSettings.Keys.ToArray();
+        selectedModel = modelNames.First();
 
         agentNames = EssayAgents.GetAgentNames();
         selectedAgentNames = [agentNames.Last()];

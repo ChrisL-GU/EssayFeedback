@@ -52,14 +52,17 @@ Ideas for future agents are:
 
 Deploy the following models to Azure Foundry:
 
-- `Llama-3.3-70B-Instruct` and use the name "llama"
-- `gpt-4o` and use the name "gpt-40"
+- `gpt-4o` and use the name "GPT-4o"
+- `Llama-3.3-70B-Instruct` and use the name "Llama-3.3-70B-Instruct"
+- `Ministral-3b` and use the name "Ministral-3b"
 
 Add the `dotnet user-secrets`:
 
 ```
-dotnet user-secrets set "AzureOpenAISettings:EndpointLlama" "<API endpoint>"
-dotnet user-secrets set "AzureOpenAISettings:EndpointGpt4o" "<API endpoint>"
-dotnet user-secrets set "AzureOpenAISettings:ApiKeyLlama" "<API key>"
-dotnet user-secrets set "AzureOpenAISettings:ApiKeyGpt4o" "<API key>"
+dotnet user-secrets set "AzureAISettings:EndpointGPT4o" "<API endpoint>"
+dotnet user-secrets set "AzureAISettings:EndpointLlama3-8b" "<API endpoint>"
+dotnet user-secrets set "AzureAISettings:EndpointMinistral-3b" "<API endpoint>"
+dotnet user-secrets set "AzureAISettings:ApiKeyGPT4o" "<API key>"
+dotnet user-secrets set "AzureAISettings:ApiKeyLlama3-8b" "<API key>"
+dotnet user-secrets set "AzureAISettings:ApiKeyMinistral-3b" "<API key>"
 ```

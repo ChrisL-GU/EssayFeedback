@@ -23,7 +23,7 @@
                 }
             </MudSelect>
             <MudSelect T="string" Label="Model to use" @bind-value="selectedModel">
-                @foreach (var modelName in modelNames.Keys)
+                @foreach (var modelName in modelNames)
                 {
                     <MudSelectItem T="string" Value="@modelName">@modelName</MudSelectItem>
                 }

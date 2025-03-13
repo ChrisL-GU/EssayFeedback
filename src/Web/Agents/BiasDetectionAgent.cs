@@ -57,17 +57,9 @@ public static class BiasDetectionAgent
             (Continue for all identified biases)
             </feedback>
 
-            If no biases are found, your feedback should state this clearly:
-
-            <feedback>
-            ## Identified Biases
-
-            No significant biases were identified in the essay.
-            </feedback>
-
             Remember to be objective in your analysis and provide clear reasoning for each identified instance of bias. Your
-            detailed critical examination in the <essay_analysis> tags should precede the feedback and explain your
-            thought process thoroughly.
+            detailed critical examination in the <essay_analysis> tags should precede the <feedback> and explain your
+            thought process thoroughly. Remeber to insert closing tags for each section.
 
             Please begin your critical examination now.
         """;
