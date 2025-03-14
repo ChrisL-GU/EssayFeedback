@@ -30,7 +30,13 @@ public static class ApStylebookAgent
 
             After your analysis, provide your final evaluation within <feedback> tags, formatted in markdown.
             Structure your response as follows:
-
+            
+            <essay_analysis>
+            1. **Sentence**: [Sentence]
+               - **Potential Violation**: [Key phrase]
+               - **AP Style Rule**: [Cite the specific rule]
+               - **Analysis**: [Your analysis of the sentence]
+            </essay_analysis>
             <feedback>
             # AP Style Violations
 

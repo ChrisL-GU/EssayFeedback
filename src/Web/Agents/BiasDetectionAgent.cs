@@ -43,8 +43,16 @@ public static class BiasDetectionAgent
             6. After your critical examination, provide your feedback in markdown format, wrapped in <feedback> XML tags.
             The structure should be as follows:
 
+            <essay_analysis>
+            ## Bias Analysis
+            
+            ### Language
+            - **[Bias]**: 
+              - Quote: [Sentence]
+                - [Explanation]
+            </essay_analysis>
             <feedback>
-            ## Identified Biases
+            # Identified Biases
 
             1. [Type of Bias]
                 - **Original Text:** "Quote containing the bias"

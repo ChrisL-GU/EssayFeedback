@@ -66,7 +66,6 @@ public static class ToneConsistencyAgent
 
             Impact of disciplinary conventions: [Your observations]
             </essay_analysis>
-
             <feedback>
             # Tone Consistency Evaluation
 
