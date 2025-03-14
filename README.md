@@ -13,7 +13,7 @@ identify issues and provide explanations of the issue.
 The demo evaulates [Paul Graham's essay Writes and Write-Nots essay][] using the AP Stylebook,
 Bias Detection and Tone Consistenty Evaluator agents.
 
-https://github.com/user-attachments/assets/86539fd2-e8ce-4f3b-acb0-9068af46e2d7
+https://github.com/user-attachments/assets/c269c9f5-0f86-4824-a275-f71f8ff2c788
 
 [Paul Graham's essay Writes and Write-Nots essay]: https://www.paulgraham.com/writes.html
 
