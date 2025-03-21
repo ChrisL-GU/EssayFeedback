@@ -10,29 +10,46 @@ public record AgentHistoryResponse(string ModelAnalysis, string Recommendation);
 
 public class AgentManagement(Settings settings)
 {
-    public AgentGroupChat CreateAgentGroupChatFor(string selectedModel, string[] selectedAgentNames)
+    public GroupAgents CreateAgentGroupChatFor(string selectedModel, string[] selectedAgentNames)
     {
         var builder = Kernel.CreateBuilder();
 
-        var modelSettings = settings.AzureAiSettings.Single(modelSettings => modelSettings.Key == selectedModel);
+        var modelSettings = settings
+            .AzureAiSettings
+            .ModelSettings
+            .Single(modelSettings => modelSettings.Key == selectedModel);
         if (modelSettings.Value.IsAzureOpenAiModel) AddOpenASettings(modelSettings, builder);
         else AddAiInferenceSettings(modelSettings, builder);
-            
+
         var kernel = builder.Build();
-        var agents = new EssayAgents(kernel);
-        
-        return new AgentGroupChat(agents.GetAgentsByName(selectedAgentNames))
-        {
-            ExecutionSettings = new AgentGroupChatSettings
+        var agents = new EssayAgents(kernel, settings);
+
+        return new GroupAgents(
+            new AgentGroupChat(agents.GetAgentsByName(selectedAgentNames))
             {
-                SelectionStrategy = new SequentialSelectionStrategy(),
-                TerminationStrategy = new ApprovalTerminationStrategy()
+                ExecutionSettings = new AgentGroupChatSettings
                 {
-                    Agents = [agents.FinalAgent],
-                    MaximumIterations = agents.GetAgents().Length
+                    SelectionStrategy = new SequentialSelectionStrategy(),
+                    TerminationStrategy = new ApprovalTerminationStrategy()
+                    {
+                        Agents = [agents.FinalAgent],
+                        MaximumIterations = agents.GetAgents().Length
+                    }
+                }
+            },
+            new AgentGroupChat(agents.GetAzureAgentsByName(selectedAgentNames))
+            {
+                ExecutionSettings = new AgentGroupChatSettings
+                {
+                    SelectionStrategy = new SequentialSelectionStrategy(),
+                    TerminationStrategy = new ApprovalTerminationStrategy()
+                    {
+                        Agents = [agents.FinalAzureAiAgent],
+                        MaximumIterations = agents.GetAgents().Length
+                    }
                 }
             }
-        };
+        );
     }
 
     public async Task<AgentHistoryResponse> AggergateAgentHistoryResponses(AgentGroupChat chat)
@@ -53,15 +70,16 @@ public class AgentManagement(Settings settings)
         return new AgentHistoryResponse(modelAnalysis.ToString(), modelRecommendation.ToString()); 
     }
 
-    private void AddOpenASettings(KeyValuePair<string, AiSettings> modelSettings, IKernelBuilder builder) =>
+    private void AddOpenASettings(KeyValuePair<string, ModelSettings> modelSettings, IKernelBuilder builder) =>
         builder.AddAzureOpenAIChatCompletion(
             modelSettings.Key,
             modelSettings.Value.Endpoint,
             modelSettings.Value.ApiKey);
 
-    private void AddAiInferenceSettings(KeyValuePair<string, AiSettings> modeliSettings, IKernelBuilder builder) =>
+    private void AddAiInferenceSettings(KeyValuePair<string, ModelSettings> modeliSettings, IKernelBuilder builder) =>
         builder.AddAzureAIInferenceChatCompletion(
             modeliSettings.Key,
             modeliSettings.Value.ApiKey,
             new Uri(modeliSettings.Value.Endpoint));
 }
+public record GroupAgents(AgentGroupChat StandardChat, AgentGroupChat AzureAiAgentChat);

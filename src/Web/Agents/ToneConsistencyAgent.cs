@@ -1,5 +1,6 @@
 namespace EssayFeedback.Agents;
 
+using Common;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 
@@ -88,7 +89,7 @@ public static class ToneConsistencyAgent
             the content as described above.
          """;
 
-    public static ChatCompletionAgent CreateAgent(Kernel kernel) =>
+    public static ChatCompletionAgent CreateAgent(Kernel kernel, Settings _) =>
         new()
         {
             Name = nameof(ToneConsistencyAgent),

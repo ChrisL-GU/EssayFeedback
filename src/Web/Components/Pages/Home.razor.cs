@@ -10,7 +10,6 @@ using MudBlazor;
 
 public partial class Home : ComponentBase
 {
-    private AgentGroupChat chat = new();
     private string[] agentNames = [];
     private IEnumerable<string> selectedAgentNames = [];
     private string[] modelNames = [];
@@ -32,7 +31,7 @@ public partial class Home : ComponentBase
     protected override async Task OnInitializedAsync()
     {
         if (await FeatureManager.IsEnabledAsync("DefaultEssayText")) EssayText = TextToAnalyze.PaulGraham;
-        modelNames = Settings.AzureAiSettings.Keys.ToArray();
+        modelNames = Settings.AzureAiSettings.ModelSettings.Keys.ToArray();
         selectedModel = modelNames.First();
 
         agentNames = EssayAgents.GetAgentNames();
@@ -54,19 +53,29 @@ public partial class Home : ComponentBase
             new DialogOptions {MaxWidth = MaxWidth.Medium, FullWidth = true,  Position = DialogPosition.TopCenter} );
         var dialogInstance = dialog.Dialog as ModelProcessingDialog;
 
-        chat = AgentManagement.CreateAgentGroupChatFor(selectedModel, selectedAgentNames.ToArray());
+        var groupAgents = AgentManagement.CreateAgentGroupChatFor(selectedModel, selectedAgentNames.ToArray());
+        var azureAiChat = groupAgents.AzureAiAgentChat;
+        azureAiChat.AddChatMessage(new ChatMessageContent(AuthorRole.User, EssayText));
+        azureAiChat.IsComplete = false;
+        await foreach (var chatMessageContent in azureAiChat.InvokeAsync())
+        {
+            text += chatMessageContent.Content ?? "";
+            dialogInstance?.UpdateText(text);
+        }
+        var (azureAiModelAnalysis, azureAiModelFeedback) = await AgentManagement.AggergateAgentHistoryResponses(azureAiChat);
+
+        var chat = groupAgents.StandardChat;
         chat.AddChatMessage(new ChatMessageContent(AuthorRole.User, EssayText));
         chat.IsComplete = false;
-        
         await foreach (var chatMessageContent in chat.InvokeStreamingAsync())
         {
             text += chatMessageContent.Content ?? "";
             dialogInstance?.UpdateText(text);
         }
-
+        
         var (modelAnalysis, modelFeedback) = await AgentManagement.AggergateAgentHistoryResponses(chat);
-        RenderedRecommendationMarkdown = (MarkupString)Markdig.Markdown.ToHtml(modelFeedback);
-        RenderedModelMarkdown = (MarkupString)Markdig.Markdown.ToHtml(modelAnalysis);
+        RenderedRecommendationMarkdown = (MarkupString)Markdig.Markdown.ToHtml(azureAiModelFeedback + modelFeedback);
+        RenderedModelMarkdown = (MarkupString)Markdig.Markdown.ToHtml(azureAiModelAnalysis + modelAnalysis);
         
         DialogService.Close(dialog);
         dialogInstance?.UpdateText("");

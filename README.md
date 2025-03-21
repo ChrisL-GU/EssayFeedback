@@ -65,4 +65,5 @@ dotnet user-secrets set "AzureAISettings:EndpointMinistral-3b" "<API endpoint>"
 dotnet user-secrets set "AzureAISettings:ApiKeyGPT4o" "<API key>"
 dotnet user-secrets set "AzureAISettings:ApiKeyLlama3-8b" "<API key>"
 dotnet user-secrets set "AzureAISettings:ApiKeyMinistral-3b" "<API key>"
+dotnet user-secrets set "AzureAISettings:AIAgentConnectionString" "<Connection string>"
 ```

@@ -1,5 +1,6 @@
 namespace EssayFeedback.Agents;
 
+using Common;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 
@@ -60,7 +61,7 @@ public static class ApStylebookAgent
             with entire essay.
         """;
 
-        public static ChatCompletionAgent CreateAgent(Kernel kernel) =>
+        public static ChatCompletionAgent CreateAgent(Kernel kernel, Settings _) =>
              new ChatCompletionAgent()
                 {
                     Name = nameof(ApStylebookAgent),
