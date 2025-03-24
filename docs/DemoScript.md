@@ -1,22 +1,21 @@
-## Describe
-
-- This demo application utilizes AI models to provide feedback on essays.
-- The application consists of AI agents, where each agent focuses on a specific writing criteria.
+## Introduction
+This demo showcases an AI-powered application designed to provide feedback on essays. The application uses specialized AI agents, each focusing on a specific writing criterion.  
 
 ## Usage
 
-- The user is able to enter their essay text.
-- Select which criteria to analyze their essay.
-- Select which models to use to perform the analysis.
+- Users enter their essay.
+- Choose which writing criteria to analyze.
+- Select the AI models to use for evaluation.
 
 ## Analysis
 
-- For demo purposes, while the text is being analyzed a dialog will be displayed streaming the content provided by the model while is analyzing the essay.
-- Two types of agents are currently in use. One type of agent is defined entirely using prompt engineering to instruct the agent on how to analyze the essay.
-- The second agent is defined in the cloud. In addition to prompt engineering it also makes use of an knowledge article on the topic of the evaluation which is uses to perform its analysis.
-- The agents are configured to operate within group chat. Currently each agent is allowed one turn. They take their turn in sequence and the group chat is terminated once the last agent has responded.
+- As the essay is analyzed, a live dialog displays the model's streaming responses.
+- Two types of AI agents are used by the application.
+    - The first type of agent relies solely on prompt engineering to analyze the essay. General guidelines are provided to the AI model on how to evaluate the essay.
+    - The second type of agent uses both prompt engineering and reference knowledge articles to provide deeper insights. 
+- The agents operate in a structured group chat, where each agent is allowed one turn in sequence. The group chat concludes after the last agent has responded.
 
 ## Feedback
 
-- Once the analysis is complete the feedback provided by the model will be displayed to the right of the essay allowing the user to review the provided feedback and make any changes to their essay.
-- Additionally, below the essay text the raw content response of the model can be revealed and reviewed.
+- Once the analysis is complete, structured feedback appears to the right of the essay for easy review and revisions of the essay text
+- Users can also access the raw AI-generated responses below the essay for deeper insight.  
