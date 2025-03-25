@@ -17,8 +17,6 @@ public class Settings
                 .Build();
     }
 
-    //public Dictionary<string, ModelSettings> AzureAiSettings => azureAiSettings ??= new()
-    
     public AzureAiSettings AzureAiSettings => azureAiSettings ??= new(
         new Dictionary<string, ModelSettings>
         {
@@ -31,20 +29,20 @@ public class Settings
             },
             {
                 "Meta-Llama-3-8B-Instruct", new ModelSettings(
-                    GetRequiredConfigValue("AzureAISettings:EndpointLlama3-8b"),
-                    GetRequiredConfigValue("AzureAISettings:ApiKeyLlama3-8b"))
+                    GetRequiredConfigValue("AzureAISettings:EndpointLlama3_8b"),
+                    GetRequiredConfigValue("AzureAISettings:ApiKeyLlama3_8b"))
 
             },
             {
                 "Ministral-3b", new ModelSettings(
-                    GetRequiredConfigValue("AzureAISettings:EndpointMinistral-3b"),
-                    GetRequiredConfigValue("AzureAISettings:ApiKeyMinistral-3b"))
+                    GetRequiredConfigValue("AzureAISettings:EndpointMinistral_3b"),
+                    GetRequiredConfigValue("AzureAISettings:ApiKeyMinistral_3b"))
             }
         },
         new AgentSettings(GetRequiredConfigValue("AzureAISettings:AIAgentConnectionString")));
 
     private string GetRequiredConfigValue(string key) =>
-        configRoot.GetValue<string>(key) ?? throw new NullReferenceException();
+        configRoot.GetValue<string>(key) ?? throw new NullReferenceException(key);
 }
 
 public record ModelSettings(string Endpoint, string ApiKey, bool IsAzureOpenAiModel = false);

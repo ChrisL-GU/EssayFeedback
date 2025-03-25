@@ -48,7 +48,7 @@ Ideas for future agents are:
 - Technical Terminology Reviewer - Checks for appropriate use of domain-specific terminology
 - Visual Element Integration Advisor - Provides feedback on the effective use of charts, graphs, or images
 
-## Running locally
+## Running
 
 Deploy the following models to Azure Foundry:
 
@@ -56,14 +56,32 @@ Deploy the following models to Azure Foundry:
 - `Llama-3.3-70B-Instruct` and use the name "Llama-3.3-70B-Instruct"
 - `Ministral-3b` and use the name "Ministral-3b"
 
+### Locally
+
 Add the `dotnet user-secrets`:
 
 ```
 dotnet user-secrets set "AzureAISettings:EndpointGPT4o" "<API endpoint>"
-dotnet user-secrets set "AzureAISettings:EndpointLlama3-8b" "<API endpoint>"
-dotnet user-secrets set "AzureAISettings:EndpointMinistral-3b" "<API endpoint>"
+dotnet user-secrets set "AzureAISettings:EndpointLlama3_8b" "<API endpoint>"
+dotnet user-secrets set "AzureAISettings:EndpointMinistral_3b" "<API endpoint>"
 dotnet user-secrets set "AzureAISettings:ApiKeyGPT4o" "<API key>"
-dotnet user-secrets set "AzureAISettings:ApiKeyLlama3-8b" "<API key>"
-dotnet user-secrets set "AzureAISettings:ApiKeyMinistral-3b" "<API key>"
+dotnet user-secrets set "AzureAISettings:ApiKeyLlama3_8b" "<API key>"
+dotnet user-secrets set "AzureAISettings:ApiKeyMinistral_3b" "<API key>"
 dotnet user-secrets set "AzureAISettings:AIAgentConnectionString" "<Connection string>"
 ```
+
+## Codespaces
+
+Add GitHub Codespaces secrets using the names:
+
+```
+AzureAISettings__EndpointGPT4o
+AzureAISettings__EndpointLlama3_8b
+AzureAISettings__EndpointMinistral_3b
+AzureAISettings__ApiKeyGPT4o
+AzureAISettings__ApiKeyLlama3_8b
+AzureAISettings__ApiKeyMinistral_3b
+AzureAISettings__AIAgentConnectionString
+```
+
+When running the Codespace open the terminal and use the Azure CLI to login in: `az login`
