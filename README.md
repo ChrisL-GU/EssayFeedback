@@ -17,6 +17,17 @@ https://github.com/user-attachments/assets/c269c9f5-0f86-4824-a275-f71f8ff2c788
 
 [Paul Graham's essay Writes and Write-Nots essay]: https://www.paulgraham.com/writes.html
 
+## Responsible AI checklist
+
+[Principles from Microsoft's responsible AI](https://www.microsoft.com/en-us/ai/responsible-ai)
+
+- Fairness: The agents are guided by prompts but most of the agents rely on their own evaluation criteria, and therefore rely on their training. Therefore their recommendations are susceptible to discrimination. Some agents, such as the agent for Tone, are more at risk than other agents with more well established guidelines, such as the AP Stylebook.
+- Reliability and safety: The application is meant for demonstrations and is not deployed anywhere. Therefore it is not robust and can error. The application should not be relied on for production level work.
+- Privacy and security: No data is stored, either by the browser or on the server, and no data is shared with any party.
+- Inclusiveness: The application relies on the training of the models to provide recommendations. The application attempts to provide a variety of evaluation criteria which will be helpful for a diverse group of people. The UI is simple, but not robust with minimal intentional accessibility built in.
+- Transparency: The AI model feedback is displayed to the user while executing and can be viewed after processing has finished. AI prompts are also accessible for users to review, along with the application code, to assist in understanding reasons for recommendations which were provided.
+- Accountability: No auditing or tracing currently exist for the application. Care was taken to craft prompts, but do not have evaluations.
+
 ## Agents
 
 The currently implemented agents are:
