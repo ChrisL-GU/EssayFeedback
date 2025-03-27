@@ -55,14 +55,21 @@ public partial class Home : ComponentBase
 
         var groupAgents = AgentManagement.CreateAgentGroupChatFor(selectedModel, selectedAgentNames.ToArray());
         var azureAiChat = groupAgents.AzureAiAgentChat;
-        azureAiChat.AddChatMessage(new ChatMessageContent(AuthorRole.User, EssayText));
-        azureAiChat.IsComplete = false;
-        await foreach (var chatMessageContent in azureAiChat.InvokeAsync())
+        var azureAiModelAnalysis = "";
+        var azureAiModelFeedback = "";
+        if (azureAiChat.Agents.Count > 0)
         {
-            text += chatMessageContent.Content ?? "";
-            dialogInstance?.UpdateText(text);
+            azureAiChat.AddChatMessage(new ChatMessageContent(AuthorRole.User, EssayText));
+            azureAiChat.IsComplete = false;
+            await foreach (var chatMessageContent in azureAiChat.InvokeAsync())
+            {
+                text += chatMessageContent.Content ?? "";
+                dialogInstance?.UpdateText(text);
+            }
+
+            (azureAiModelAnalysis, azureAiModelFeedback) =
+                await AgentManagement.AggergateAgentHistoryResponses(azureAiChat);
         }
-        var (azureAiModelAnalysis, azureAiModelFeedback) = await AgentManagement.AggergateAgentHistoryResponses(azureAiChat);
 
         var chat = groupAgents.StandardChat;
         chat.AddChatMessage(new ChatMessageContent(AuthorRole.User, EssayText));
