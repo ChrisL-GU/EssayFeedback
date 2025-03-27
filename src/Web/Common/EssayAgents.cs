@@ -18,6 +18,14 @@ public class EssayAgents
          {"Inclusive Language", InclusiveLanguageAgent.CreateAgent }
      };
 
+     private static readonly Dictionary<string, string> agentNameMap = new()
+     {
+         {nameof(ApStylebookAgent), "AP Stylebook" },
+         {nameof(CognitiveBiasDetectionAgent), "Cognitive Bias" },
+         {nameof(ToneConsistencyAgent), "Tone Consistency" },
+         {"Inclusive language", "Inclusive Language" }
+     };
+
      public EssayAgents(Kernel kernel, Settings settings)
      {
          this.settings = settings;
@@ -42,9 +50,14 @@ public class EssayAgents
              .ToArray();
 
      public static string[] GetAgentNames() => scaffoldAgents.Keys.ToArray();
-     public Agent InitialAgent => GetAgents().First();
-     public Agent FinalAzureAiAgent => GetAgents().Last(agent => agent is AzureAIAgent);
-     
-     public Agent FinalAgent => GetAgents().Last(agent => agent is not AzureAIAgent);
+     public Agent? GetFinalAzureAiAgent(string[] selectedAgentNames) => GetAgents()
+         .LastOrDefault(agent => agent is AzureAIAgent && IsAgentInSelectedList(selectedAgentNames, agent));
 
+     public Agent? GetFinalAgent(string[] selectedAgentNames) => GetAgents()
+         .LastOrDefault(agent => agent is not AzureAIAgent && IsAgentInSelectedList(selectedAgentNames, agent));
+
+     private static bool IsAgentInSelectedList(string[] selectedAgentNames, Agent agent) =>
+         selectedAgentNames.Contains(agentNameMap.Single(map => map.Key.Equals(
+                 agent.Name,
+                 StringComparison.OrdinalIgnoreCase)).Value);
 }

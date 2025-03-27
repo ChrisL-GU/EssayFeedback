@@ -72,14 +72,17 @@ public partial class Home : ComponentBase
         }
 
         var chat = groupAgents.StandardChat;
-        chat.AddChatMessage(new ChatMessageContent(AuthorRole.User, EssayText));
-        chat.IsComplete = false;
-        await foreach (var chatMessageContent in chat.InvokeStreamingAsync())
+        if (chat.Agents.Count > 0)
         {
-            text += chatMessageContent.Content ?? "";
-            dialogInstance?.UpdateText(text);
+            chat.AddChatMessage(new ChatMessageContent(AuthorRole.User, EssayText));
+            chat.IsComplete = false;
+            await foreach (var chatMessageContent in chat.InvokeStreamingAsync())
+            {
+                text += chatMessageContent.Content ?? "";
+                dialogInstance?.UpdateText(text);
+            }
         }
-        
+
         var (modelAnalysis, modelFeedback) = await AgentManagement.AggergateAgentHistoryResponses(chat);
         RenderedRecommendationMarkdown = (MarkupString)Markdig.Markdown.ToHtml(azureAiModelFeedback + modelFeedback);
         RenderedModelMarkdown = (MarkupString)Markdig.Markdown.ToHtml(azureAiModelAnalysis + modelAnalysis);

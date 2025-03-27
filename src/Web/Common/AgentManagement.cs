@@ -24,6 +24,8 @@ public class AgentManagement(Settings settings)
         var kernel = builder.Build();
         var agents = new EssayAgents(kernel, settings);
 
+        var finalAgent = agents.GetFinalAgent(selectedAgentNames);
+        var finalAzureAiAgent = agents.GetFinalAzureAiAgent(selectedAgentNames);
         return new GroupAgents(
             new AgentGroupChat(agents.GetAgentsByName(selectedAgentNames))
             {
@@ -32,7 +34,7 @@ public class AgentManagement(Settings settings)
                     SelectionStrategy = new SequentialSelectionStrategy(),
                     TerminationStrategy = new ApprovalTerminationStrategy()
                     {
-                        Agents = [agents.FinalAgent],
+                        Agents = finalAgent is null ? [] : [finalAgent],
                         MaximumIterations = agents.GetAgents().Length
                     }
                 }
@@ -44,7 +46,7 @@ public class AgentManagement(Settings settings)
                     SelectionStrategy = new SequentialSelectionStrategy(),
                     TerminationStrategy = new ApprovalTerminationStrategy()
                     {
-                        Agents = [agents.FinalAzureAiAgent],
+                        Agents = finalAzureAiAgent is null ? [] : [finalAzureAiAgent],
                         MaximumIterations = agents.GetAgents().Length
                     }
                 }
