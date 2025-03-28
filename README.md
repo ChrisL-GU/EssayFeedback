@@ -83,7 +83,20 @@ dotnet user-secrets set "AzureAISettings:AIAgentConnectionString" "<Connection s
 
 ## Codespaces
 
-Add GitHub Codespaces secrets using the names:
+Since the application uses an agent defined in Azure AI Foundry an Azure token credential is required. Therefore, after the Codespace starts open the terminal and use the Azure CLI to login in, `az login`. This is the easiest way for the Codespace environment to have a token credential available for use.
+
+All of the following environment variables are required. The environment variables should be added by adding a GitHub Codespaces secret for each variable.
+
+
+> [!TIP]
+> In GitHub go to Settings -> Secrets and variables -> Codespaces
+
+> [!TIP]
+> The values for the secrets can be found in Azure AI Foundry project for the application.
+> - The connection string in on the overview page of the project.
+> - The API keys are currently the same for each model. The API key is on the overview page.
+> - The endpoint for Llama and Ministral is the "Azure AI Inference" endpoint value on the overview page.
+> - The endpoint for GPT is the "Azure OpenAI Service" endpoint value on the overview page.
 
 ```
 AzureAISettings__EndpointGPT4o
@@ -94,5 +107,3 @@ AzureAISettings__ApiKeyLlama3_8b
 AzureAISettings__ApiKeyMinistral_3b
 AzureAISettings__AIAgentConnectionString
 ```
-
-When running the Codespace open the terminal and use the Azure CLI to login in: `az login`
